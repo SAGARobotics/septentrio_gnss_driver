@@ -193,6 +193,7 @@ namespace settings {
             settings.publish_velcovgeodetic = true;
             settings.publish_atteuler = true;
             settings.publish_attcoveuler = true;
+            settings.publish_yawimu = true;
             settings.publish_insnavcart = true;
             settings.publish_insnavgeod = true;
             settings.publish_imusetup = true;

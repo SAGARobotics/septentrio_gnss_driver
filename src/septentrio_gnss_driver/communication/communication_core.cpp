@@ -918,6 +918,7 @@ namespace io {
                     blocks << " +AttEuler";
                 }
                 if (settings_->publish_attcoveuler ||
+                    settings_->publish_yawimu ||
                     (settings_->publish_gpsfix &&
                      (settings_->septentrio_receiver_type == "gnss")) ||
                     (settings_->publish_pose &&
@@ -1050,6 +1051,11 @@ namespace io {
                     tcpVsm_.get()->send(velNmea);
             }
         }
+    }
+
+    void CommunicationCore::sendRtcm(const std::string& rtcmData)
+    {
+        manager_.get()->send(rtcmData);
     }
 
     std::string CommunicationCore::resetMainConnection()

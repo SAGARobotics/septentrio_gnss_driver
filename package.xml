@@ -38,16 +38,17 @@
   <build_depend condition="$ROS_VERSION == 1">message_generation</build_depend>
   <depend condition="$ROS_VERSION == 1">roscpp</depend>
   <exec_depend condition="$ROS_VERSION == 1">message_runtime</exec_depend>
-  
+
   <depend>diagnostic_msgs</depend>
   <depend>nmea_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>rtcm_msgs</depend>
   <depend condition="$ROS_VERSION == 2">gps_msgs</depend>
   <depend condition="$ROS_VERSION == 1">gps_common</depend>
   <depend>nav_msgs</depend>
   <depend>boost</depend>
-  <depend>libpcap</depend>  
+  <depend>libpcap</depend>
   <depend>geographiclib</depend>
   <depend>tf2</depend>
   <depend>tf2_eigen</depend>

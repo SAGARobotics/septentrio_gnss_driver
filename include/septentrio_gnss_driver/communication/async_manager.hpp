@@ -62,6 +62,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/regex.hpp>
+#include <deque>
 
 // ROSaic includes
 #include <septentrio_gnss_driver/crc/crc.hpp>
@@ -135,6 +136,7 @@ namespace io {
         void runIoContext();
         void runWatchdog();
         void write(const std::string& cmd);
+        void startNextWrite();
         void resync();
         template <uint8_t index>
         void readSync();
@@ -161,6 +163,8 @@ namespace io {
         std::shared_ptr<Telegram> telegram_;
         //! TelegramQueue
         TelegramQueue* telegramQueue_;
+        //! Write queue
+        std::deque<std::string> writeQueue_;
     };
 
     template <typename IoType>
@@ -297,21 +301,41 @@ namespace io {
     template <typename IoType>
     void AsyncManager<IoType>::write(const std::string& cmd)
     {
+        writeQueue_.push_back(cmd);
+        if (writeQueue_.size() > 1) {
+            return;
+        }
+        startNextWrite();
+    }
+
+    template <typename IoType>
+    void AsyncManager<IoType>::startNextWrite()
+    {
+        const std::string& cmd = writeQueue_.front();
         boost::asio::async_write(
             *(ioInterface_.stream_), boost::asio::buffer(cmd.data(), cmd.size()),
-            [this, cmd](boost::system::error_code ec, std::size_t /*length*/) {
-                if (!ec)
+            [this](boost::system::error_code ec, std::size_t /*length*/) {
+                if (!writeQueue_.empty())
                 {
-                    // Prints the data that was sent
-                    node_->log(log_level::DEBUG, "AsyncManager sent the following " +
-                                                     std::to_string(cmd.size()) +
-                                                     " bytes to the Rx: " + cmd);
-                } else
-                {
-                    node_->log(log_level::ERROR,
-                               "AsyncManager was unable to send the following " +
-                                   std::to_string(cmd.size()) +
-                                   " bytes to the Rx: " + cmd);
+                    const std::string& sentCmd = writeQueue_.front();
+                    if (!ec)
+                    {
+                        // Prints the data that was sent
+                        node_->log(log_level::DEBUG, "AsyncManager sent the following " +
+                                                         std::to_string(sentCmd.size()) +
+                                                         " bytes to the Rx: " + sentCmd);
+                    } else
+                    {
+                        node_->log(log_level::ERROR,
+                                   "AsyncManager was unable to send the following " +
+                                       std::to_string(sentCmd.size()) +
+                                       " bytes to the Rx: " + sentCmd);
+                    }
+                    writeQueue_.pop_front();
+                    if (!writeQueue_.empty())
+                    {
+                        startNextWrite();
+                    }
                 }
             });
     }

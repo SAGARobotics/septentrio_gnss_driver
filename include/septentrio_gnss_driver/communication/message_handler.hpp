@@ -345,6 +345,11 @@ namespace io {
         void assembleGpsFix();
 
         /**
+         * @brief "Callback" function when constructing ImuMsg messages from AttCovEuler
+         */
+        void assembleYawImu();
+
+        /**
          * @brief "Callback" function when constructing PoseWithCovarianceStamped
          * messages
          */

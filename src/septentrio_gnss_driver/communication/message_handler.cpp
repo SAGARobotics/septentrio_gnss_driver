@@ -2094,6 +2094,24 @@ namespace io {
         publish<GpsFixMsg>("gpsfix", msg);
     }
 
+    void MessageHandler::assembleYawImu()
+    {
+        if (!settings_->publish_yawimu)
+            return;
+
+        ImuMsg msg;
+        msg.header = last_pvtgeodetic_.header;
+        msg.header.frame_id = settings_->poi_frame_id;
+
+        msg.orientation = convertEulerToQuaternionMsg(
+            0.0, 0.0,
+            deg2rad(last_atteuler_.heading));
+
+        msg.orientation_covariance[8] = convertAutoCovariance(last_attcoveuler_.cov_headhead);
+
+        publish<ImuMsg>("yawimu", msg);
+    }
+
     void
     MessageHandler::assembleTimeReference(const std::shared_ptr<Telegram>& telegram)
     {
@@ -2388,6 +2406,10 @@ namespace io {
             assembleHeader(settings_->frame_id, telegram, last_attcoveuler_);
             if (settings_->publish_attcoveuler)
                 publish<AttCovEulerMsg>("attcoveuler", last_attcoveuler_);
+            if (settings_->publish_yawimu)
+            {
+                assembleYawImu();
+            }
             assemblePoseWithCovarianceStamped();
             if (settings_->septentrio_receiver_type == "gnss")
                 assembleGpsFix();

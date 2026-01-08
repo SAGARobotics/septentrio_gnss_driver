@@ -205,6 +205,7 @@ namespace rosaic_node {
         param("publish.velcovgeodetic", settings_.publish_velcovgeodetic, false);
         param("publish.atteuler", settings_.publish_atteuler, false);
         param("publish.attcoveuler", settings_.publish_attcoveuler, false);
+        param("publish.yawimu", settings_.publish_yawimu, false);
         param("publish.insnavcart", settings_.publish_insnavcart, false);
         param("publish.insnavgeod", settings_.publish_insnavgeod, false);
         param("publish.imusetup", settings_.publish_imusetup, false);
@@ -547,6 +548,35 @@ namespace rosaic_node {
             settings_.rtk.serial.push_back(serialSettings);
         }
 
+        // RTCM subscription topics
+        for (uint8_t i = 1; i < 6; ++i)
+        {
+            RtkRtcmTopic rtcmTopicSettings;
+            std::string rtcm = "rtcm_topic_" + std::to_string(i);
+
+            param("rtk_settings." + rtcm + ".topic_name", rtcmTopicSettings.topic_name,
+                  std::string(""));
+
+            if (rtcmTopicSettings.topic_name.empty())
+            {
+                RCLCPP_WARN(this->get_logger(),
+                            "rtk_settings.%s.topic_name is empty, skipping.",
+                            rtcm.c_str());
+                continue;
+            }
+
+            settings_.rtk.rtcm_topic.push_back(rtcmTopicSettings);
+
+            RCLCPP_INFO(this->get_logger(),
+                      "RTCM corrections will be subscribed from topic %s",
+                          rtcmTopicSettings.topic_name.c_str());
+        }
+
+        if (settings_.rtk.rtcm_topic.size() > 0)
+        {
+            registerRtkRtcmTopicSubscribers();
+        }
+
         {
             // deprecation warnings
             std::string tempString;
@@ -826,6 +856,12 @@ namespace rosaic_node {
     {
         IO_.sendVelocity(velNmea);
     }
+
+    void ROSaicNode::sendRtcm(const std::string& rtcmDataStr)
+    {
+        IO_.sendRtcm(rtcmDataStr);
+    }
+
 } // namespace rosaic_node
 
 #include "rclcpp_components/register_node_macro.hpp"

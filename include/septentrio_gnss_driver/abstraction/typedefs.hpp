@@ -56,6 +56,7 @@
 #include <geometry_msgs/msg/twist_with_covariance_stamped.hpp>
 #include <gps_msgs/msg/gps_fix.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <rtcm_msgs/msg/message.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
 #include <sensor_msgs/msg/time_reference.hpp>
@@ -229,6 +230,30 @@ public:
         } catch (const std::runtime_error& ex)
         {
             this->log(log_level::ERROR, "Subscriber initialization failed due to: " +
+                                            std::string(ex.what()) + ".");
+        }
+    }
+
+    void registerRtkRtcmTopicSubscribers()
+    {
+        try
+        {
+            for (const auto& rtcm : settings_.rtk.rtcm_topic)
+            {
+                auto subscriber = this->create_subscription<rtcm_msgs::msg::Message>(
+                    rtcm.topic_name, 5,
+                    std::bind(&ROSaicNodeBase::callbackRtcm, this,
+                              std::placeholders::_1));
+
+                rtcmSubscribers_.push_back(subscriber);
+
+                this->log(log_level::INFO, "Subscribed to RTCM topic: " +
+                                                rtcm.topic_name);
+            }
+        }
+        catch (const std::runtime_error& ex)
+        {
+            this->log(log_level::ERROR, "RTCM subscriber initialization failed due to: " +
                                             std::string(ex.what()) + ".");
         }
     }
@@ -610,11 +635,19 @@ private:
         }
     }
 
+    void callbackRtcm(const rtcm_msgs::msg::Message::ConstSharedPtr rtcm)
+    {
+        std::string rtcmData(rtcm->message.begin(), rtcm->message.end());
+        sendRtcm(rtcmData);
+    }
+
 protected:
     //! Settings
     Settings settings_;
     //! Send velocity to communication layer (virtual)
     virtual void sendVelocity(const std::string& velNmea) = 0;
+    //! Send rtcm to communication layer (virtual)
+    virtual void sendRtcm(const std::string& rtcmData) = 0;
 
 private:
     //! Map of topics and publishers
@@ -627,6 +660,8 @@ private:
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometrySubscriber_;
     //! Twist subscriber
     rclcpp::Subscription<TwistWithCovarianceStampedMsg>::SharedPtr twistSubscriber_;
+    //! RTCM subscribers
+    std::vector<rclcpp::Subscription<rtcm_msgs::msg::Message>::SharedPtr> rtcmSubscribers_;
     //! Last tf stamp
     Timestamp lastTfStamp_ = 0;
     //! tf buffer

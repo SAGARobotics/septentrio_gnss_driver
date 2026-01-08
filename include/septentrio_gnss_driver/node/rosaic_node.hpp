@@ -127,6 +127,8 @@ namespace rosaic_node {
 
         void sendVelocity(const std::string& velNmea);
 
+        void sendRtcm(const std::string& rtcmDataStr);
+
         //! Handles communication with the Rx
         io::CommunicationCore IO_;
         //! tf2 buffer and listener

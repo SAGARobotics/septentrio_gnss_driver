@@ -102,11 +102,18 @@ struct RtkSerial
     bool keep_open;
 };
 
+struct RtkRtcmTopic
+{
+    //! ROS topic name to subscribe to for RTCM correction data
+    std::string topic_name;
+};
+
 struct Rtk
 {
     std::vector<RtkNtrip> ntrip;
     std::vector<RtkIpServer> ip_server;
     std::vector<RtkSerial> serial;
+    std::vector<RtkRtcmTopic> rtcm_topic;
 };
 
 struct InsVsm
@@ -296,6 +303,8 @@ struct Settings
     bool publish_atteuler;
     //! Whether or not to publish the AttCovEulerMsg message
     bool publish_attcoveuler;
+    //! Whether or not to publish the yaw Imu message
+    bool publish_yawimu;
     //! Whether or not to publish the INSNavCartMsg message
     bool publish_insnavcart;
     //! Whether or not to publish the INSNavGeodMsg message

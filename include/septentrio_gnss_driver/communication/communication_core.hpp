@@ -126,6 +126,12 @@ namespace io {
          */
         void sendVelocity(const std::string& velNmea);
 
+        /**
+         * @brief Hands over RTCM correction data to the send() method of manager_
+         * @param rtcmData The RTCM data to hand over
+         */
+        void sendRtcm(const std::string& rtcmData);
+
     private:
         /**
          * @brief Resets Rx settings

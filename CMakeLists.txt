@@ -44,6 +44,7 @@ if(catkin_FOUND)
   sensor_msgs
   geometry_msgs
   nav_msgs
+  rtcm_msgs
   diagnostic_msgs
   gps_common
   message_generation
@@ -157,6 +158,7 @@ elseif(ament_cmake_FOUND)
   find_package(nmea_msgs REQUIRED)
   find_package(sensor_msgs REQUIRED)
   find_package(geometry_msgs REQUIRED)
+  find_package(rtcm_msgs REQUIRED)
   find_package(gps_msgs REQUIRED)
   find_package(nav_msgs REQUIRED)
   find_package(tf2 REQUIRED)
@@ -207,6 +209,7 @@ elseif(ament_cmake_FOUND)
     nmea_msgs
     sensor_msgs
     geometry_msgs
+    rtcm_msgs
     gps_msgs
     nav_msgs
     tf2
@@ -242,6 +245,7 @@ elseif(ament_cmake_FOUND)
     ${GeographicLib_LIBRARIES}
     ${diagnostic_msgs_TARGETS}
     ${geometry_msgs_TARGETS}
+    ${rtcm_msgs_TARGETS}
     ${gps_msgs_TARGETS}
     ${nav_msgs_TARGETS}
     ${nmea_msgs_TARGETS}
