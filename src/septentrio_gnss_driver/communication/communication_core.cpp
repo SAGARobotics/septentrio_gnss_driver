@@ -453,6 +453,21 @@ namespace io {
                 }
             }
 
+            // Set correction age setting
+            if (settings_->rtk.corrections_max_age_s > 0)
+            {
+                {
+                    std::stringstream ss;
+                    ss << "sdca, " << 10 << ", " << settings_->rtk.corrections_max_age_s << " \x0D";
+                    send(ss.str());
+                }
+                {
+                    std::stringstream ss;
+                    ss << "sdcu, LowLatency, " << settings_->rtk.corrections_max_age_s << ", auto, 0" << " \x0D";
+                    send(ss.str());
+                }
+            }
+
             // Configuring the corrections connection
             for (auto ntrip : settings_->rtk.ntrip)
             {

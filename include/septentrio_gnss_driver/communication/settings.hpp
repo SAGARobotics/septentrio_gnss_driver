@@ -110,6 +110,7 @@ struct RtkRtcmTopic
 
 struct Rtk
 {
+    double corrections_max_age_s;
     std::vector<RtkNtrip> ntrip;
     std::vector<RtkIpServer> ip_server;
     std::vector<RtkSerial> serial;

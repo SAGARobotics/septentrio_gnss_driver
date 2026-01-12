@@ -458,6 +458,10 @@ namespace rosaic_node {
         }
 
         // RTK correction parameters
+
+        // Corrections max age
+        param("rtk_settings.corrections_max_age_s", settings_.rtk.corrections_max_age_s, -1.0);
+
         // NTRIP
         for (uint8_t i = 1; i < 4; ++i)
         {
