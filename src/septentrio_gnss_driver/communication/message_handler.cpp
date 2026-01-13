@@ -1583,7 +1583,12 @@ namespace io {
             msg.position_covariance_type =
                 NavSatFixMsg::COVARIANCE_TYPE_DIAGONAL_KNOWN;
         }
-        publish<NavSatFixMsg>("navsatfix", msg);
+
+        // Only publish if all values are valid
+        if (validValue(msg.latitude) && validValue(msg.longitude) && validValue(msg.altitude))
+        {
+            publish<NavSatFixMsg>("navsatfix", msg);
+        }
     };
 
     void MessageHandler::setStatus(uint8_t mode, GpsFixMsg& msg)
@@ -2109,7 +2114,12 @@ namespace io {
 
         msg.orientation_covariance[8] = convertAutoCovariance(last_attcoveuler_.cov_headhead);
 
-        publish<ImuMsg>("yawimu", msg);
+        // Only publish if all values are valid
+        if (validValue(msg.orientation.x) && validValue(msg.orientation.y) && validValue(msg.orientation.z) &&
+            validValue(msg.orientation.w))
+        {
+            publish<ImuMsg>("yawimu", msg);
+        }
     }
 
     void
